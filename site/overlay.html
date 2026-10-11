@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Словотрон</title>
+<link rel="stylesheet" href="css/overlay.css">
+</head>
+<body>
+<div id="stage" hidden>
+  <div class="card" id="card">
+    <div class="cam"></div>
+    <section class="main" id="main">
+      <header class="head" id="head">
+        <div class="brand">Словотрон</div>
+        <div class="round">раунд <b id="round"></b></div>
+        <div class="status" id="status"></div>
+        <div class="clock" id="clock"></div>
+        <div class="count">слов <b id="count">0</b></div>
+      </header>
+      <div class="play" id="play">
+        <div class="timeline" id="timeline">
+          <div class="track"><div class="fill" id="fill"></div></div>
+          <div class="label" id="label"></div>
+        </div>
+        <div class="plaque" id="plaque" hidden>
+          <span class="answer" id="answer"></span>
+          <span class="verdict"><span id="verdict"></span><span id="winner"></span></span>
+        </div>
+        <div class="column"><h3>Ближе всего</h3><div class="rows" id="best"></div></div>
+      </div>
+      <div class="lobby" id="lobby" hidden>
+        <div class="title">Словотрон</div>
+        <h1>Угадай загаданное слово</h1>
+        <p>Пиши слова в чат: чем меньше число, тем ближе к ответу</p>
+        <div class="countdown" id="countdown"><b id="countdown-number"></b></div>
+        <p class="waiting" id="waiting" hidden></p>
+      </div>
+      <div class="pause" id="pause" hidden>
+        <h2>Пауза</h2>
+        <div class="boards">
+          <div class="list" id="board-round"><h3>В этом раунде</h3><ol id="pause-round"></ol></div>
+          <div class="list" id="board-total"><h3>Победители</h3><ol id="pause-total"></ol></div>
+        </div>
+      </div>
+    </section>
+    <aside class="list chatbox"><h3>Чат</h3><div class="chat" id="chat"></div></aside>
+    <aside class="side" id="side">
+      <div class="list" id="box-total"><h3>Победители</h3><ol id="list-total"></ol></div>
+      <div class="list" id="box-round"><h3>В этом раунде</h3><ol id="list-round"></ol></div>
+      <div class="list rules" id="box-rules"><h3>Как играть</h3><ul id="rules"></ul></div>
+    </aside>
+    <canvas class="confetti" id="confetti"></canvas>
+  </div>
+</div>
+<script type="module" src="js/overlay.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Словотрон — угадай слово по смыслу, игра для чата Twitch</title>
+<meta name="description" content="Игра для чата Twitch на русском: загадано слово, зрители пишут свои, а игра показывает, насколько каждое близко по смыслу. Играй прямо в браузере или вставь ссылку в OBS — ставить ничего не нужно.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23151325'/%3E%3Crect x='5' y='6.5' width='22' height='5' rx='2.5' fill='%2316a34a'/%3E%3Crect x='5' y='13.5' width='15' height='5' rx='2.5' fill='%23eab308'/%3E%3Crect x='5' y='20.5' width='9' height='5' rx='2.5' fill='%23f97316'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/page.css">
+</head>
+<body>
+<main class="page">
+  <header class="top">
+    <h1>Словотрон</h1>
+    <p class="tagline" id="status">угадай слово по смыслу</p>
+    <form class="controls" id="start" autocomplete="off">
+      <input type="text" id="s-channel" placeholder="канал Twitch" spellcheck="false" aria-label="Канал Twitch">
+      <button type="submit" class="primary" id="play" disabled>Начать</button>
+      <button type="button" id="pause" disabled>Пауза</button>
+      <button type="button" id="hint" title="Открыть подсказку, не дожидаясь голосования" disabled>Подсказка</button>
+      <button type="button" id="skip" title="Закончить раунд и загадать новое слово" disabled>Новое слово</button>
+      <button type="button" id="reset" title="Очистить таблицу победителей" disabled>Сброс</button>
+      <button type="button" id="toggle-settings" aria-expanded="false" aria-controls="settings">Настройки</button>
+      <button type="button" id="toggle-link" aria-expanded="false" aria-controls="link-panel">Ссылка для OBS</button>
+    </form>
+    <p class="author">Оригинальная идея <a href="https://fra3a.ru/" target="_blank" rel="noopener">FRA3A</a> · Автор копии <a href="https://www.twitch.tv/sumaizu" target="_blank" rel="noopener">Sumaizu</a></p>
+    <section class="panel popover" id="link-panel" hidden>
+      <div class="row">
+        <input type="text" id="link" readonly aria-label="Ссылка на оверлей">
+        <button type="button" id="copy">Копировать</button>
+      </div>
+      <p class="status" id="link-status"></p>
+      <p class="hint">Вставь ссылку в источник «Браузер» в OBS, размер 1920×1080. Игра начинается через 10 секунд после того, как источник появился на экране. Пока источник скрыт, игра стоит на паузе.</p>
+    </section>
+  </header>
+
+  <div class="layout" id="layout">
+    <div class="stage">
+      <div class="screen">
+        <iframe id="game" title="Словотрон"></iframe>
+        <p class="note" id="example-note">Пример: слова, чат и победители выдуманные</p>
+      </div>
+    </div>
+
+    <form class="panel settings" id="settings" autocomplete="off" hidden>
+      <fieldset>
+        <legend>Слова</legend>
+        <div class="field">
+          <label for="s-backend">Кто загадывает слово и считает близость</label>
+          <select id="s-backend">
+            <option value="kontekstno">контекстно.рф</option>
+            <option value="wordgun">wordgun.ru</option>
+          </select>
+          <p class="hint" id="backend-hint"></p>
+        </div>
+        <div class="field" id="difficulty-field">
+          <label for="s-difficulty">Сложность слов</label>
+          <select id="s-difficulty"><option value="">любые слова</option></select>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Раунд</legend>
+        <div class="field">
+          <label for="s-pause">Пауза после раунда</label>
+          <div class="row"><input type="number" id="s-pause" min="5" max="600"><span class="hint">секунд, потом новое слово</span></div>
+        </div>
+        <div class="field">
+          <label for="s-hint_every">Подсказка</label>
+          <div class="row"><input type="number" id="s-hint_every" min="0" max="3600"><span class="hint">секунд без нового лучшего слова</span></div>
+          <p class="hint">Игра сама открывает слово ближе к загаданному. 0 — без подсказок</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Чат</legend>
+        <label class="check">
+          <input type="checkbox" id="s-chat_commands">
+          <span>Команды для стримера и модераторов
+            <span class="hint"><code>!словотрон-раунд</code> — новое слово</span>
+            <span class="hint"><code>!словотрон-подсказка</code> — подсказка сразу</span>
+            <span class="hint"><code>!словотрон-пауза</code> — пауза, ещё раз — продолжить</span>
+            <span class="hint"><code>!словотрон-сброс</code> — очистить таблицу победителей</span>
+          </span>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Таблица победителей</legend>
+        <div class="field">
+          <label for="s-reset_mode">Очищать</label>
+          <select id="s-reset_mode">
+            <option value="never">только вручную: кнопкой или командой</option>
+            <option value="day">каждый день</option>
+            <option value="week">каждую неделю, в понедельник</option>
+            <option value="month">каждый месяц, первого числа</option>
+            <option value="timer">по таймеру</option>
+          </select>
+        </div>
+        <div class="field" id="reset-hour-field">
+          <label for="s-reset_hour">В котором часу</label>
+          <div class="row"><input type="number" id="s-reset_hour" min="0" max="23"><span class="hint">часов, по времени компьютера с игрой</span></div>
+        </div>
+        <div class="field" id="reset-hours-field">
+          <label for="s-reset_hours">Таймер</label>
+          <div class="row"><span class="hint">каждые</span><input type="number" id="s-reset_hours" min="1" max="720"><span class="hint">часов</span></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Звук</legend>
+        <label class="check"><input type="checkbox" id="s-sound"><span>Звуки игры</span></label>
+        <div class="field">
+          <label for="s-volume">Громкость</label>
+          <div class="row">
+            <input type="range" id="s-volume" min="0" max="100" step="5">
+            <span class="hint" id="volume-text"></span>
+            <button type="button" id="listen">Послушать</button>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Вид</legend>
+        <div class="split">
+          <div class="group">
+            <div class="field">
+              <label for="s-accent">Цвет оформления</label>
+              <div class="row"><input type="color" id="s-accent"></div>
+            </div>
+            <div class="switch" role="group" aria-label="Окошко под вебку">
+              <button type="button" data-webcam="1">С вебкой</button><button type="button" data-webcam="0">Без вебки</button>
+            </div>
+          </div>
+          <div class="group">
+            <label class="check"><input type="checkbox" id="hide-chat"><span>Скрыть чат <span class="hint">вместе с окошком под вебку</span></span></label>
+            <label class="check"><input type="checkbox" id="hide-side"><span>Убрать победителей и правила</span></label>
+            <label class="check"><input type="checkbox" id="hide-bg"><span>Прозрачный фон</span></label>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="footer"><button type="button" class="quiet" id="defaults">Рекомендуемые настройки</button></div>
+    </form>
+  </div>
+</main>
+<script type="module" src="js/page.js"></script>
+</body>
+</html>

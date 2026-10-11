@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Словотрон — тесты</title>
+<style>
+  body { margin: 24px; font: 15px/1.5 "Segoe UI", system-ui, sans-serif; background: #14121f; color: #ece8df; }
+  pre { white-space: pre-wrap; color: #ff8f85; }
+  .passed { color: #7fd9a2; }
+</style>
+</head>
+<body>
+<h1>Тесты</h1>
+<div id="report">идут…</div>
+<script type="module">
+  const FILES = ['config.test.js', 'backends.test.js', 'engine.test.js', 'chat.test.js', 'pages.test.js'];
+  const report = document.getElementById('report');
+  try {
+    if (!window.__sealed) throw new Error('тесты запускаются командой: python tools/jstest.py');
+    for (const file of FILES) await import('./' + file);
+    const { run } = await import('./harness.js');
+    const result = await run(new URLSearchParams(location.search).get('only') || '');
+    const summary = document.createElement('p');
+    summary.className = result.failed.length ? '' : 'passed';
+    summary.textContent = 'тестов: ' + result.total + ', прошло: ' + result.passed + ', упало: ' + result.failed.length;
+    report.replaceChildren(summary);
+    for (const failure of result.failed) {
+      const details = document.createElement('pre');
+      details.textContent = failure.name + '\n' + failure.error;
+      report.append(details);
+    }
+    window.__results = result;
+  } catch (error) {
+    report.textContent = String(error && error.stack ? error.stack : error);
+    window.__fatal = String(error && error.message ? error.message : error);
+  }
+</script>
+</body>
+</html>
