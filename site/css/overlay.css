@@ -10,6 +10,7 @@
   --win: #c084fc;
   --thyme: #5edc1f;
   --heart: #d42426;
+  --snow: #a6d6ff;
 }
 
 * { box-sizing: border-box; }
@@ -279,6 +280,7 @@ body {
 }
 .msg.star-white { --frame: #fff; --tint: rgba(255, 255, 255, .06); --glow: rgba(255, 255, 255, .16); }
 .msg.star-thyme { --frame: var(--thyme); --tint: rgba(94, 220, 31, .07); --glow: rgba(94, 220, 31, .2); }
+.msg.star-snow { --frame: var(--snow); --tint: rgba(166, 214, 255, .07); --glow: rgba(166, 214, 255, .2); }
 .msg.star-heart {
   --frame: var(--heart); --tint: rgba(212, 36, 38, .1); --glow: rgba(212, 36, 38, .25); padding-right: 28px;
 }
@@ -316,3 +318,10 @@ body {
 .white, .list li.first .name.white { color: #fff; }
 .thyme, .list li.first .name.thyme { color: var(--thyme); }
 .heart, .list li.first .name.heart { color: var(--heart); }
+.snow, .list li.first .name.snow {
+  background: linear-gradient(105deg, var(--snow) 0 46.5%, #fff 49.5% 50.5%, var(--snow) 53.5% 100%) -230px 0 /
+    400px 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  animation: snow-glint 6s ease-in-out var(--phase, 0s) infinite;
+}
+@keyframes snow-glint { 0%, 70% { background-position: -230px 0; } 100% { background-position: 20px 0; } }

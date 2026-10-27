@@ -631,6 +631,28 @@ test('оверлей: в чате — особые ники и смайлики;
   frame.remove();
 });
 
+test('оверлей: снежный ник — голубая рамка, по нику бежит блик, в лад у всех сообщений', async () => {
+  fresh();
+  const { frame, w, chat } = await playing();
+  const style = (node, pseudo) => w.getComputedStyle(node, pseudo);
+  const lines = () => all(w, '#chat .msg');
+  chat.onMessage('higashi_vo', 'привет всем', false, { login: 'higashi_vo' });
+  await wait(700);
+  chat.onMessage('higashi_vo', 'я тут', false, { login: 'higashi_vo' });
+  await until(() => lines().length === 2, 'два сообщения');
+  eq(lines()[0].className.split(' ').slice(0, 3), ['msg', 'star', 'star-snow']);
+  eq(style(lines()[0]).borderTopColor, 'rgb(166, 214, 255)');
+  eq(style(lines()[0].querySelector('b')).animationName, 'snow-glint');
+  ok(lines()[0].querySelector('b').classList.contains('snow'));
+  eq(style(lines()[0], '::after').content, 'none');
+  await until(() => {
+    const phases = w.document.getAnimations().filter((item) => item.animationName === 'snow-glint')
+      .map((item) => item.effect.getComputedTiming().progress);
+    return phases.length === 2 && !phases.includes(null) && Math.abs(phases[0] - phases[1]) < 0.02;
+  }, 'блик идёт в лад');
+  frame.remove();
+});
+
 test('оверлей: радуга автора идёт в лад везде, где есть его ник, — при любой длине слова', async () => {
   fresh();
   const { frame, w, chat } = await playing();
