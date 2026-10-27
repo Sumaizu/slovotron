@@ -822,6 +822,8 @@ test('страница: при первом заходе — пример, ре�
   eq([icon.split('<rect').length - 1, icon.includes('<text')], [4, false]);
   eq(all(w, '.author a').map((node) => [node.textContent, node.getAttribute('href')]),
     [['FRA3A', 'https://fra3a.ru/'], ['Sumaizu', 'https://www.twitch.tv/sumaizu']]);
+  const home = w.document.querySelector('h1 a');
+  eq([home.textContent, home.getAttribute('href'), home.target], ['Словотрон', 'https://gamesonstream.ru/', '']);
   eq([w.getComputedStyle(w.document.querySelector('h1')).color, w.getComputedStyle(element(w, 'play')).backgroundColor,
     w.getComputedStyle(element(w, 'play')).color], ['rgb(22, 163, 74)', 'rgb(22, 163, 74)', WHITE]);
   eq(net.calls, []);
@@ -887,7 +889,7 @@ test('страница: ссылка для OBS выезжает по кнопк
   toggle.click();
   element(w, 'link').click();
   no(panel.hidden);
-  w.document.querySelector('h1').click();
+  element(w, 'status').click();
   ok(panel.hidden);
   eq(toggle.getAttribute('aria-expanded'), 'false');
   frame.remove();
