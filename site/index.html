@@ -11,8 +11,7 @@
 <body>
 <main class="page">
   <header class="top">
-    <h1><a href="https://gamesonstream.ru/" title="Все игры">Словотрон</a></h1>
-    <p class="tagline" id="status">угадай слово по смыслу</p>
+    <a class="logo" href="https://gamesonstream.ru/" title="Все игры"><img src="images/logo.png" alt="Games on Stream" width="527" height="121"></a>
     <form class="controls" id="start" autocomplete="off">
       <input type="text" id="s-channel" placeholder="канал Twitch" spellcheck="false" aria-label="Канал Twitch">
       <button type="submit" class="primary" id="play" disabled>Начать</button>
@@ -23,7 +22,6 @@
       <button type="button" id="toggle-settings" aria-expanded="false" aria-controls="settings">Настройки</button>
       <button type="button" id="toggle-link" aria-expanded="false" aria-controls="link-panel">Ссылка для OBS</button>
     </form>
-    <p class="author">Оригинальная идея <a href="https://fra3a.ru/" target="_blank" rel="noopener">FRA3A</a> · Автор копии <a href="https://www.twitch.tv/sumaizu" target="_blank" rel="noopener">Sumaizu</a></p>
     <section class="panel popover" id="link-panel" hidden>
       <div class="row">
         <input type="text" id="link" readonly aria-label="Ссылка на оверлей">
@@ -143,6 +141,10 @@
       <div class="footer"><button type="button" class="quiet" id="defaults">Рекомендуемые настройки</button></div>
     </form>
   </div>
+  <footer class="foot">
+    <p class="tagline" id="status"></p>
+    <p class="author">Оригинальная идея <a href="https://fra3a.ru/" target="_blank" rel="noopener">FRA3A</a> · Автор копии <a href="https://www.twitch.tv/sumaizu" target="_blank" rel="noopener">Sumaizu</a></p>
+  </footer>
 </main>
 <script type="module" src="js/page.js"></script>
 </body>

@@ -807,7 +807,7 @@ test('страница: при первом заходе — пример, ре�
   const w = frame.contentWindow, game = gameOf(w);
   ok(link(w).endsWith('/site/overlay.html'), link(w));
   ok(element(w, 'link-status').textContent.includes('канал'));
-  eq(element(w, 'status').textContent, 'угадай слово по смыслу');
+  eq(element(w, 'status').textContent, '');
   ok(element(w, 'link-panel').hidden && element(w, 'settings').hidden);
   ok(element(w, 'example-note').textContent.includes('Пример') && !element(w, 'example-note').hidden);
   eq([game.slovotron.game.state, rows(game, 'best').length], ['stopped', 15]);
@@ -822,15 +822,17 @@ test('страница: при первом заходе — пример, ре�
   eq([icon.split('<rect').length - 1, icon.includes('<text')], [4, false]);
   eq(all(w, '.author a').map((node) => [node.textContent, node.getAttribute('href')]),
     [['FRA3A', 'https://fra3a.ru/'], ['Sumaizu', 'https://www.twitch.tv/sumaizu']]);
-  const home = w.document.querySelector('h1 a');
-  eq([home.textContent, home.getAttribute('href'), home.target], ['Словотрон', 'https://gamesonstream.ru/', '']);
-  eq([w.getComputedStyle(w.document.querySelector('h1')).color, w.getComputedStyle(element(w, 'play')).backgroundColor,
-    w.getComputedStyle(element(w, 'play')).color], ['rgb(22, 163, 74)', 'rgb(22, 163, 74)', WHITE]);
+  const home = w.document.querySelector('.top .logo');
+  eq([home.getAttribute('href'), home.target, home.querySelector('img').alt],
+    ['https://gamesonstream.ru/', '', 'Games on Stream']);
+  ok(home.querySelector('img').naturalWidth > 0, 'логотип загрузился');
+  eq([w.getComputedStyle(element(w, 'play')).backgroundColor, w.getComputedStyle(element(w, 'play')).color],
+    ['rgb(22, 163, 74)', WHITE]);
   eq(net.calls, []);
   frame.remove();
 });
 
-test('страница: название, состояние и кнопки — одной полосой по центру, игра занимает остальную страницу', async () => {
+test('страница: логотип и кнопки — одной полосой по центру, внизу строка состояния и авторы, игра между ними', async () => {
   fresh();
   const frame = await mainPage();
   const w = frame.contentWindow;
@@ -839,9 +841,9 @@ test('страница: название, состояние и кнопки —
   await until(() => w.innerWidth === 1900, 'окно стало шире');
   const place = (node) => node.getBoundingClientRect();
   const strip = w.document.querySelector('.top');
-  const parts = [w.document.querySelector('h1'), element(w, 'status'), element(w, 's-channel'), element(w, 'play'),
+  const parts = [w.document.querySelector('.top .logo'), element(w, 's-channel'), element(w, 'play'),
     element(w, 'pause'), element(w, 'hint'), element(w, 'skip'), element(w, 'reset'), element(w, 'toggle-settings'),
-    element(w, 'toggle-link'), w.document.querySelector('.author')];
+    element(w, 'toggle-link')];
   const inLine = (width) => {
     const title = place(parts[0]);
     parts.forEach((node, i) => {
@@ -853,7 +855,11 @@ test('страница: название, состояние и кнопки —
   };
   inLine(1900);
   const screen = place(element(w, 'game'));
-  ok(screen.top < place(parts[0]).bottom + 30 && screen.bottom > w.innerHeight - 40, [screen.top, screen.bottom]);
+  ok(screen.top < place(parts[0]).bottom + 30 && screen.bottom > w.innerHeight - 60, [screen.top, screen.bottom]);
+  const foot = place(w.document.querySelector('.foot')), author = place(w.document.querySelector('.foot .author'));
+  ok(foot.top >= screen.bottom && foot.bottom <= w.innerHeight, [foot.top, foot.bottom]);
+  ok(w.document.querySelector('.foot').contains(element(w, 'status')));
+  ok(Math.abs(author.left + author.right - w.innerWidth) <= 4, 'подпись по центру: ' + [author.left, author.right]);
   ok(Math.abs(screen.width / screen.height - 16 / 9) < 0.02);
   eq([w.document.documentElement.scrollHeight, w.document.documentElement.scrollWidth], [w.innerHeight, w.innerWidth]);
   const before = place(element(w, 'play')).left;
@@ -947,7 +953,7 @@ test('страница: «Начать» запускает игру в брау
   element(w, 'play').click();
   eq([api.game.state, element(w, 'play').textContent, sockets[0].closed], ['stopped', 'Начать', true]);
   await until(() => element(game, 'chat').innerText.includes('уже было'), 'снова пример');
-  eq(element(w, 'status').textContent, 'угадай слово по смыслу');
+  eq(element(w, 'status').textContent, '');
   no(element(w, 'example-note').hidden);
   frame.remove();
   fresh();
