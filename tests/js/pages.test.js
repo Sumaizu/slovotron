@@ -37,6 +37,11 @@ const box = (node) => {
   const rect = node.getBoundingClientRect();
   return [Math.round(rect.left), Math.round(rect.right)];
 };
+const camAt = (w) => {
+  const stage = w.document.getElementById('stage').getBoundingClientRect();
+  const cam = w.document.querySelector('.cam').getBoundingClientRect();
+  return [cam.left - stage.left, cam.top - stage.top, cam.width, cam.height].map(Math.round);
+};
 const rows = (w, id) => all(w, '#' + id + ' .row:not(.empty)').map((row) => [
   row.querySelector('.word').textContent, row.querySelector('.who').textContent,
   row.querySelector('.rank') ? row.querySelector('.rank').textContent : '']);
@@ -283,7 +288,7 @@ test('оверлей: победа — длинная фиолетовая пл�
   eq([plaque.hidden, plaque.classList.contains('won'), answer.textContent, style(answer).textTransform,
     style(answer).fontSize, all(w, '.tile').length], [false, true, 'серп', 'uppercase', '44px', 0]);
   ok(style(plaque).backgroundImage.includes('rgb(147, 51, 234)'), style(plaque).backgroundImage);
-  eq([plaque.offsetWidth, plaque.offsetHeight], [704, 80]);
+  eq([plaque.offsetWidth, plaque.offsetHeight], [720, 80]);
   eq([element(w, 'status').textContent, element(w, 'verdict').textContent, element(w, 'winner').textContent],
     ['Слово угадано!', 'Победитель', 'Лиса Алиса']);
   eq(style(w.document.querySelector('#winner .chip b')).color, 'rgb(255, 105, 180)');
@@ -554,19 +559,23 @@ test('оверлей: сайт обновился — страница пере�
 test('оверлей: скрытые панели убавляют рамку, а поле игры остаётся на месте', async () => {
   fresh();
   const full = await playing();
-  eq([box(element(full.w, 'card')), box(element(full.w, 'main'))], [[10, 1270], [326, 1030]]);
+  eq([box(element(full.w, 'card')), box(element(full.w, 'main'))], [[6, 1274], [318, 1038]]);
+  eq(camAt(full.w), [18, 494, 280, 210], 'окошко под вебку — там же, где в других играх');
+  const backdrop = full.w.getComputedStyle(element(full.w, 'stage'), '::before');
+  ok(backdrop.display !== 'none' && backdrop.boxShadow.includes('1400px'), 'место за рамкой залито, окошко пустое');
   eq(full.w.document.documentElement.style.getPropertyValue('--accent'), '#16a34a');
   full.frame.remove();
   const bare = await playing('chat=0&side=0&bg=0&accent=3fa7ff');
   const classes = bare.w.document.body.classList;
   ok(classes.contains('nochat') && classes.contains('noside') && classes.contains('nobg'));
-  eq([box(element(bare.w, 'card')), box(element(bare.w, 'main'))], [[306, 1050], [326, 1030]]);
+  eq([box(element(bare.w, 'card')), box(element(bare.w, 'main'))], [[306, 1050], [318, 1038]]);
+  eq(bare.w.getComputedStyle(element(bare.w, 'stage'), '::before').display, 'none');
   eq(bare.w.getComputedStyle(bare.w.document.querySelector('.chatbox')).display, 'none');
   eq(bare.w.getComputedStyle(element(bare.w, 'side')).display, 'none');
   eq(bare.w.document.documentElement.style.getPropertyValue('--accent'), '#3fa7ff');
   bare.frame.remove();
   const left = await playing('side=0&webcam=0');
-  eq([box(element(left.w, 'card')), box(element(left.w, 'main'))], [[10, 1050], [326, 1030]]);
+  eq([box(element(left.w, 'card')), box(element(left.w, 'main'))], [[6, 1050], [318, 1038]]);
   eq(left.w.getComputedStyle(left.w.document.querySelector('.cam')).display, 'none');
   left.frame.remove();
 });
