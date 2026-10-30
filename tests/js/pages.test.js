@@ -501,9 +501,9 @@ test('оверлей: у победителя последнего раунда 
   fresh();
 });
 
-test('оверлей: пауза во время отсчёта и без правой панели — рамка на месте, потом отсчёт продолжается', async () => {
+test('оверлей: пауза во время отсчёта в минималистичном оверлее — рамка на месте, потом отсчёт продолжается', async () => {
   fresh();
-  const frame = await overlay('side=0');
+  const frame = await overlay('mini=1');
   const w = frame.contentWindow, game = w.slovotron.game;
   await until(() => !element(w, 'lobby').hidden, 'отсчёт на экране');
   const field = box(element(w, 'main')), card = box(element(w, 'card'));
@@ -556,7 +556,7 @@ test('оверлей: сайт обновился — страница пере�
   fresh();
 });
 
-test('оверлей: скрытые панели убавляют рамку, а поле игры остаётся на месте', async () => {
+test('оверлей: окошко под вебку на общем месте, минималистичный оверлей — вертикальный и без фона', async () => {
   fresh();
   const full = await playing();
   eq([box(element(full.w, 'card')), box(element(full.w, 'main'))], [[6, 1274], [318, 1038]]);
@@ -573,19 +573,30 @@ test('оверлей: скрытые панели убавляют рамку, �
   ok(backdrop.display !== 'none' && backdrop.boxShadow.includes('1400px'), 'место за рамкой залито, окошко пустое');
   eq(back.w.document.documentElement.style.getPropertyValue('--accent'), '#16a34a');
   back.frame.remove();
-  const bare = await playing('chat=0&side=0&bg=0&accent=3fa7ff');
-  const classes = bare.w.document.body.classList;
-  ok(classes.contains('nochat') && classes.contains('noside') && classes.contains('nobg'));
-  eq([box(element(bare.w, 'card')), box(element(bare.w, 'main'))], [[306, 1050], [318, 1038]]);
-  eq(bare.w.getComputedStyle(element(bare.w, 'stage'), '::before').display, 'none');
-  eq(bare.w.getComputedStyle(bare.w.document.querySelector('.chatbox')).display, 'none');
-  eq(bare.w.getComputedStyle(element(bare.w, 'side')).display, 'none');
-  eq(bare.w.document.documentElement.style.getPropertyValue('--accent'), '#3fa7ff');
-  bare.frame.remove();
-  const left = await playing('side=0&webcam=0');
-  eq([box(element(left.w, 'card')), box(element(left.w, 'main'))], [[6, 1050], [318, 1038]]);
-  eq(left.w.getComputedStyle(left.w.document.querySelector('.cam')).display, 'none');
-  left.frame.remove();
+  const mini = await playing('mini=1&accent=3fa7ff');
+  ok(mini.w.document.body.classList.contains('mini'));
+  const stage = box(element(mini.w, 'stage')), field = box(element(mini.w, 'main'));
+  eq([stage[1] - stage[0], field[0] - stage[0], stage[1] - field[1]], [640, 16, 16], 'вертикальная сцена 640×720');
+  eq(mini.w.getComputedStyle(element(mini.w, 'stage'), '::before').display, 'none');
+  for (const node of [mini.w.document.querySelector('.chatbox'), element(mini.w, 'side'), mini.w.document.querySelector('.cam'),
+    element(mini.w, 'round').parentNode, element(mini.w, 'label')]) {
+    eq(mini.w.getComputedStyle(node).display, 'none');
+  }
+  eq(mini.w.getComputedStyle(element(mini.w, 'card')).backgroundImage, 'none');
+  ok(mini.w.document.querySelector('.head .logo').naturalWidth > 0, 'логотип сайта рядом с названием');
+  eq(mini.w.document.documentElement.style.getPropertyValue('--accent'), '#3fa7ff');
+  await wait(900);
+  const column = box(mini.w.document.querySelector('.column')), brand = box(mini.w.document.querySelector('.head .brand'));
+  const hint = box(element(mini.w, 'timeline'));
+  ok([column[0] - field[0], column[1] - brand[1], hint[1] - brand[1]].every((gap) => Math.abs(gap) <= 3),
+    'полоска и плашки — до конца названия: ' + [column, hint, brand, field]);
+  mini.w.slovotron.chat.onMessage('Петя', 'молот', false, {});
+  await until(() => all(mini.w, '#best .who').length, 'слово в списке');
+  ok(all(mini.w, '#best .who').every((who) => mini.w.getComputedStyle(who).display === 'none'), 'ников нет');
+  mini.frame.remove();
+  const nocam = await playing('webcam=0');
+  eq(nocam.w.getComputedStyle(nocam.w.document.querySelector('.cam')).display, 'none');
+  nocam.frame.remove();
 });
 
 test('оверлей: грубое слово на экране спрятано, число видно', async () => {
@@ -747,9 +758,8 @@ test('встроенный оверлей: пока игру не начали �
   eq([element(w, 'label').textContent, element(w, 'clock').textContent], ['подсказка через 2:06', '5:12']);
   await wait(600);
   eq([element(w, 'clock').textContent, api.view.heard, net.calls], ['5:12', [], []]);
-  api.apply({ chat: false, side: false, hint_every: 0, accent: '#3fa7ff' });
-  const classes = w.document.body.classList;
-  ok(classes.contains('nochat') && classes.contains('noside'));
+  api.apply({ mini: true, hint_every: 0, accent: '#3fa7ff' });
+  ok(w.document.body.classList.contains('mini'));
   eq(w.getComputedStyle(element(w, 'timeline')).visibility, 'hidden');
   no(rows(w, 'best').some((row) => row[1] === 'подсказка'));
   eq(w.document.documentElement.style.getPropertyValue('--accent'), '#3fa7ff');
@@ -774,9 +784,9 @@ test('встроенный оверлей: «начать» — настояща
   await until(() => rows(w, 'best').length === 1, 'слово на экране');
   const shown = w.document.querySelector('#best .row');
   await until(() => api.view.heard.length === 2, 'звук лучшего слова');
-  api.apply({ channel: 'some_channel', side: false, hint_every: 300, pause: 45 });
+  api.apply({ channel: 'some_channel', mini: true, hint_every: 300, pause: 45 });
   eq([api.game.state, api.game.s.hint_every, api.game.snapshot().round], ['playing', 300, 1]);
-  await until(() => w.document.body.classList.contains('noside'), 'победители скрыты на ходу');
+  await until(() => w.document.body.classList.contains('mini'), 'минималистичный оверлей на ходу');
   await until(() => element(w, 'label').textContent.startsWith('подсказка через 5:0'), 'новый срок подсказки');
   await wait(300);
   eq([rows(w, 'best').length, w.document.querySelector('#best .row') === shown, api.view.heard.length], [1, true, 2]);
@@ -933,7 +943,7 @@ test('страница: кнопка «Настройки» открывает �
   ok(Math.abs(place(screen).width / place(screen).height - 16 / 9) < 0.02);
   ok(panel.scrollHeight > panel.clientHeight && place(panel).bottom <= w.innerHeight);
   eq(w.document.documentElement.scrollHeight, w.innerHeight);
-  for (const id of ['s-backend', 's-hint_every', 's-accent', 'hide-chat', 'hide-side', 'hide-bg', 'defaults']) {
+  for (const id of ['s-backend', 's-hint_every', 's-accent', 's-mini', 'defaults']) {
     ok(place(element(w, id)).left >= place(panel).left && place(element(w, id)).right <= place(panel).right, id);
   }
   eq(all(w, '.check code').map((node) => node.textContent), ['!словотрон-раунд', '!словотрон-подсказка',
@@ -1060,12 +1070,13 @@ test('страница: настройки действуют сразу — и 
   type(w, 's-hint_every', '0');
   await until(() => game.getComputedStyle(element(game, 'timeline')).visibility === 'hidden',
     'полоса подсказок скрыта');
-  type(w, 'hide-chat', true);
+  type(w, 's-mini', true);
   eq(all(w, '[data-webcam]').map((button) => button.textContent), ['Без вебки', 'С вебкой', 'Витубер']);
   w.document.querySelector('[data-webcam="none"]').click();
   ok(w.document.querySelector('[data-webcam="none"]').classList.contains('on'));
-  await until(() => game.document.body.classList.contains('nochat'), 'чат скрыт на ходу');
-  eq(query(w), 'channel=some_one&pause=45&hint_every=0&webcam=none&chat=0');
+  await until(() => game.document.body.classList.contains('mini'), 'минималистичный оверлей на ходу');
+  ok(element(w, 'webcam-field').hidden && element(w, 'game').parentNode.classList.contains('mini'));
+  eq(query(w), 'channel=some_one&pause=45&hint_every=0&webcam=none&mini=1');
   type(w, 's-accent', '#3fa7ff');
   await until(() => game.document.documentElement.style.getPropertyValue('--accent') === '#3fa7ff', 'цвет на ходу');
   type(w, 's-backend', 'wordgun');
@@ -1082,7 +1093,7 @@ test('страница: настройки действуют сразу — и 
   await until(() => api.game._next, 'следующая игра загадана');
   ok(net.calls.includes('api.wordgun.ru/v2/create_game') && api.game._next.id.endsWith('-hard'), api.game._next.id);
   element(w, 'defaults').click();
-  eq([query(w), element(w, 's-channel').value, element(w, 'hide-chat').checked, element(w, 's-backend').value,
+  eq([query(w), element(w, 's-channel').value, element(w, 's-mini').checked, element(w, 's-backend').value,
     element(w, 's-accent').value, api.game.s.pause, api.game.s.hint_every],
   ['channel=some_one', 'some_one', false, 'kontekstno', '#16a34a', 20, 180]);
   ok(element(w, 'difficulty-field').hidden);
@@ -1094,15 +1105,15 @@ test('страница: настройки действуют сразу — и 
 test('страница: настройки запоминаются между заходами, адрес страницы важнее запомненного', async () => {
   fresh();
   localStorage.setItem('slovotron.settings', JSON.stringify({ pause: 12, backend: 'wordgun', difficulty: 'hell',
-    chat: false }));
+    mini: true }));
   let frame = await mainPage();
   let w = frame.contentWindow;
-  eq(query(w), 'backend=wordgun&difficulty=hell&pause=12&chat=0');
-  eq([element(w, 's-pause').value, element(w, 's-backend').value, element(w, 'hide-chat').checked], ['12', 'wordgun',
+  eq(query(w), 'backend=wordgun&difficulty=hell&pause=12&mini=1');
+  eq([element(w, 's-pause').value, element(w, 's-backend').value, element(w, 's-mini').checked], ['12', 'wordgun',
     true]);
   await until(() => element(w, 's-difficulty').options.length === 4, 'сложности загружены');
-  eq([element(w, 's-difficulty').value, query(w)], ['hell', 'backend=wordgun&difficulty=hell&pause=12&chat=0']);
-  ok(gameOf(w).document.body.classList.contains('nochat'));
+  eq([element(w, 's-difficulty').value, query(w)], ['hell', 'backend=wordgun&difficulty=hell&pause=12&mini=1']);
+  ok(gameOf(w).document.body.classList.contains('mini'));
   frame.remove();
   frame = await mainPage('?pause=45&hint_every=0');
   w = frame.contentWindow;

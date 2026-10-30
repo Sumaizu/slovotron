@@ -12,9 +12,7 @@ export const DEFAULTS = {
   volume: 100,
   accent: '#16a34a',
   webcam: 'cam',
-  chat: true,
-  side: true,
-  bg: true,
+  mini: false,
 };
 
 const BACKEND_NAMES = ['kontekstno', 'wordgun'];
@@ -73,9 +71,7 @@ export function clean(raw) {
   s.volume = int(raw.volume, d.volume, 0, 100);
   s.accent = COLOR_RE.test(String(raw.accent || '')) ? String(raw.accent).toLowerCase() : d.accent;
   s.webcam = camera(raw.webcam, d.webcam);
-  s.chat = flag(raw.chat, d.chat);
-  s.side = flag(raw.side, d.side);
-  s.bg = flag(raw.bg, d.bg);
+  s.mini = flag(raw.mini, d.mini);
   return s;
 }
 

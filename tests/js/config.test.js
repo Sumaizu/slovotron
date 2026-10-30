@@ -1,5 +1,5 @@
 import { DEFAULTS, clean, fromQuery, toQuery } from '../../site/js/config.js';
-import { eq, test } from './harness.js';
+import { eq, no, test } from './harness.js';
 
 test('настройки: значения по умолчанию', () => {
   eq(clean({}), DEFAULTS);
@@ -50,11 +50,11 @@ test('настройки: источник слов и сложность', () =
 });
 
 test('настройки: флажки', () => {
-  const off = clean({ chat_commands: 'false', sound: 'off', webcam: 'no', chat: 0, side: false, bg: '' });
-  eq([off.chat_commands, off.sound, off.webcam, off.chat, off.side, off.bg],
-    [false, false, 'none', false, false, false]);
-  const on = clean({ chat_commands: 'да', sound: true, webcam: 1 });
-  eq([on.chat_commands, on.sound, on.webcam], [true, true, 'cam']);
+  const off = clean({ chat_commands: 'false', sound: 'off', webcam: 'no', mini: '', chat: 0, side: false, bg: '' });
+  eq([off.chat_commands, off.sound, off.webcam, off.mini], [false, false, 'none', false]);
+  no('chat' in off || 'side' in off || 'bg' in off);
+  const on = clean({ chat_commands: 'да', sound: true, webcam: 1, mini: 'да' });
+  eq([on.chat_commands, on.sound, on.webcam, on.mini], [true, true, 'cam', true]);
 });
 
 test('настройки: окошко под вебку — без вебки, с вебкой, витубер; старые ссылки читаются', () => {
@@ -87,7 +87,7 @@ test('ссылка: в неё попадает только то, что отл�
 test('ссылка: настройки возвращаются из неё теми же', () => {
   const settings = clean({ channel: 'streamer', backend: 'wordgun', difficulty: 'hell', pause: 45,
     hint_every: 120, chat_commands: false, reset_mode: 'week', reset_hour: 3, reset_hours: 48, sound: false,
-    volume: 35, accent: '#12ab9f', webcam: 'vtuber', chat: false, side: false, bg: false });
+    volume: 35, accent: '#12ab9f', webcam: 'vtuber', mini: true });
   eq(fromQuery('?' + toQuery(settings)), settings);
   eq(fromQuery(''), DEFAULTS);
   eq(fromQuery('?embed=1&channel=Streamer&accent=%2312AB9F').accent, '#12ab9f');

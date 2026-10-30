@@ -2,7 +2,7 @@ import { Confetti } from './confetti.js';
 import { Emotes } from './emotes.js';
 import { play } from './sound.js';
 
-const STAGE_WIDTH = 1280, STAGE_HEIGHT = 720;
+const STAGE_WIDTH = 1280, MINI_WIDTH = 640, STAGE_HEIGHT = 720;
 const ROW = { height: 32, gap: 5, usual: 15, finale: 12 };
 const TOP_ROWS = 10;
 const ANSWER = { room: 660, gap: 20, verdict: 250, largest: 44, smallest: 18, letter: 0.86 };
@@ -152,11 +152,11 @@ export class View {
     root.style.setProperty('--accent-ink', light > 0.55 ? '#06150b' : '#ffffff');
     body.classList.toggle('nocam', settings.webcam === 'none');
     body.classList.toggle('vtuber', settings.webcam === 'vtuber');
-    body.classList.toggle('nochat', !settings.chat);
-    body.classList.toggle('noside', !settings.side);
-    body.classList.toggle('nobg', !settings.bg);
+    const wasMini = body.classList.contains('mini');
+    body.classList.toggle('mini', settings.mini);
     this._paintRules();
     this._listKeys = {};
+    if (wasMini !== settings.mini) this._fitStage();
   }
 
   render(state) {
@@ -180,6 +180,7 @@ export class View {
     $('card').classList.toggle('paused', paused);
     $('pause').hidden = !paused;
     $('head').hidden = $('play').hidden = waiting || paused;
+    this._fitBrand();
     $('lobby').hidden = !waiting || paused;
     const roundKey = waiting ? '' : state.round + ':' + state.started;
     if (roundKey !== this._roundKey) {
@@ -245,8 +246,15 @@ export class View {
     $('fill').style.setProperty('--p', share(progress).toFixed(3));
   }
 
+  _fitBrand() {
+    const brand = document.querySelector('.head .brand');
+    if (!document.body.classList.contains('mini') || !brand.offsetWidth) return;
+    $('play').style.setProperty('--brand-end', brand.offsetLeft + brand.offsetWidth - $('play').offsetLeft + 'px');
+  }
+
   _fitStage() {
-    const scale = Math.min(window.innerWidth / STAGE_WIDTH, window.innerHeight / STAGE_HEIGHT);
+    const width = document.body.classList.contains('mini') ? MINI_WIDTH : STAGE_WIDTH;
+    const scale = Math.min(window.innerWidth / width, window.innerHeight / STAGE_HEIGHT);
     $('stage').style.setProperty('--k', scale);
   }
 
@@ -319,7 +327,8 @@ export class View {
     answer.hidden = !results.word;
     answer.textContent = results.word;
     const taken = winner.parentNode.offsetWidth || ANSWER.verdict;
-    answer.style.fontSize = answerSize(results.word.length, ANSWER.room - ANSWER.gap - taken) + 'px';
+    const room = Math.min(ANSWER.room, $('play').clientWidth || ANSWER.room);
+    answer.style.fontSize = answerSize(results.word.length, room - ANSWER.gap - taken) + 'px';
   }
 
   _row(row) {

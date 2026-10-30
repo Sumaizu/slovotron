@@ -28,7 +28,7 @@
         <button type="button" id="copy">Копировать</button>
       </div>
       <p class="status" id="link-status"></p>
-      <p class="hint">Вставь ссылку в источник «Браузер» в OBS, размер 1920×1080. Игра начинается через 10 секунд после того, как источник появился на экране. Пока источник скрыт, игра стоит на паузе.</p>
+      <p class="hint">Вставь ссылку в источник «Браузер» в OBS, размер 1920×1080 (у минималистичного оверлея — 960×1080). Игра начинается через 10 секунд после того, как источник появился на экране. Пока источник скрыт, игра стоит на паузе.</p>
     </section>
   </header>
 
@@ -126,7 +126,7 @@
               <label for="s-accent">Цвет оформления</label>
               <div class="row"><input type="color" id="s-accent"></div>
             </div>
-            <div class="field">
+            <div class="field" id="webcam-field">
               <span class="label" id="webcam-label">Окошко под вебку</span>
               <div class="switch" role="group" aria-labelledby="webcam-label">
                 <button type="button" data-webcam="none">Без вебки</button><button type="button" data-webcam="cam">С вебкой</button><button type="button" data-webcam="vtuber">Витубер</button>
@@ -134,9 +134,7 @@
             </div>
           </div>
           <div class="group">
-            <label class="check"><input type="checkbox" id="hide-chat"><span>Скрыть чат <span class="hint">вместе с окошком под вебку</span></span></label>
-            <label class="check"><input type="checkbox" id="hide-side"><span>Убрать победителей и правила</span></label>
-            <label class="check"><input type="checkbox" id="hide-bg"><span>Прозрачный фон</span></label>
+            <label class="check"><input type="checkbox" id="s-mini"><span>Минималистичный оверлей <span class="hint">вертикальный, 960×1080: только подсказка и слова с никами, без фона</span></span></label>
           </div>
         </div>
       </fieldset>
