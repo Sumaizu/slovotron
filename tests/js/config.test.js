@@ -6,8 +6,8 @@ test('настройки: значения по умолчанию', () => {
   eq(clean(null), DEFAULTS);
   eq(clean('мусор'), DEFAULTS);
   eq(clean([1, 2]), DEFAULTS);
-  eq([DEFAULTS.backend, DEFAULTS.pause, DEFAULTS.hint_every, DEFAULTS.chat_commands, DEFAULTS.accent],
-    ['kontekstno', 20, 180, true, '#16a34a']);
+  eq([DEFAULTS.backend, DEFAULTS.pause, DEFAULTS.hint_every, DEFAULTS.chat_commands], ['kontekstno', 20, 180, true]);
+  no('accent' in DEFAULTS);
 });
 
 test('настройки: канал', () => {
@@ -38,7 +38,7 @@ test('настройки: негодные значения заменяются
   const s = clean({ pause: 'много', hint_every: null, volume: true, accent: 'красный', reset_mode: 'иногда',
     backend: 'свой' });
   eq(s, DEFAULTS);
-  eq(clean({ accent: '#AABBCC' }).accent, '#aabbcc');
+  no('accent' in clean({ accent: '#AABBCC' }));
 });
 
 test('настройки: источник слов и сложность', () => {
@@ -80,16 +80,16 @@ test('ссылка: в неё попадает только то, что отл�
   eq(toQuery({}), '');
   eq(toQuery({ channel: 'streamer' }), 'channel=streamer');
   eq(toQuery({ channel: 'streamer', pause: 20, hint_every: 0, accent: '#00ff88', webcam: 'none' }),
-    'channel=streamer&hint_every=0&accent=00ff88&webcam=none');
+    'channel=streamer&hint_every=0&webcam=none');
   eq(toQuery({ backend: 'wordgun', difficulty: 'hard' }), 'backend=wordgun&difficulty=hard');
 });
 
 test('ссылка: настройки возвращаются из неё теми же', () => {
   const settings = clean({ channel: 'streamer', backend: 'wordgun', difficulty: 'hell', pause: 45,
     hint_every: 120, chat_commands: false, reset_mode: 'week', reset_hour: 3, reset_hours: 48, sound: false,
-    volume: 35, accent: '#12ab9f', webcam: 'vtuber', mini: true });
+    volume: 35, webcam: 'vtuber', mini: true });
   eq(fromQuery('?' + toQuery(settings)), settings);
   eq(fromQuery(''), DEFAULTS);
-  eq(fromQuery('?embed=1&channel=Streamer&accent=%2312AB9F').accent, '#12ab9f');
+  no('accent' in fromQuery('?embed=1&channel=Streamer&accent=%2312AB9F'));
   eq(fromQuery('?embed=1&channel=Streamer').channel, 'streamer');
 });

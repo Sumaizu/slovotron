@@ -28,7 +28,7 @@
         <button type="button" id="copy">Копировать</button>
       </div>
       <p class="status" id="link-status"></p>
-      <p class="hint">Вставь ссылку в источник «Браузер» в OBS, размер 1920×1080 (у минималистичного оверлея — 960×1080). Игра начинается через 10 секунд после того, как источник появился на экране. Пока источник скрыт, игра стоит на паузе.</p>
+      <p class="hint">Вставь ссылку в источник «Браузер» в OBS, размер 1920×1080 (у минималистичного оверлея — 640×1080). Игра начинается через 10 секунд после того, как источник появился на экране. Пока источник скрыт, игра стоит на паузе.</p>
     </section>
   </header>
 
@@ -41,6 +41,7 @@
     </div>
 
     <form class="panel settings" id="settings" autocomplete="off" hidden>
+      <label class="check first"><input type="checkbox" id="s-mini"><span>Минималистичный оверлей <span class="hint">вертикальный, 640×1080, без фона: только полоска подсказки и слова</span></span></label>
       <fieldset>
         <legend>Слова</legend>
         <div class="field">
@@ -118,23 +119,12 @@
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset id="webcam-field">
         <legend>Вид</legend>
-        <div class="split">
-          <div class="group">
-            <div class="field">
-              <label for="s-accent">Цвет оформления</label>
-              <div class="row"><input type="color" id="s-accent"></div>
-            </div>
-            <div class="field" id="webcam-field">
-              <span class="label" id="webcam-label">Окошко под вебку</span>
-              <div class="switch" role="group" aria-labelledby="webcam-label">
-                <button type="button" data-webcam="none">Без вебки</button><button type="button" data-webcam="cam">С вебкой</button><button type="button" data-webcam="vtuber">Витубер</button>
-              </div>
-            </div>
-          </div>
-          <div class="group">
-            <label class="check"><input type="checkbox" id="s-mini"><span>Минималистичный оверлей <span class="hint">вертикальный, 960×1080: только подсказка и слова с никами, без фона</span></span></label>
+        <div class="field">
+          <span class="label" id="webcam-label">Окошко под вебку</span>
+          <div class="switch" role="group" aria-labelledby="webcam-label">
+            <button type="button" data-webcam="none">Без вебки</button><button type="button" data-webcam="cam">С вебкой</button><button type="button" data-webcam="vtuber">Витубер</button>
           </div>
         </div>
       </fieldset>

@@ -2,7 +2,7 @@ import { Confetti } from './confetti.js';
 import { Emotes } from './emotes.js';
 import { play } from './sound.js';
 
-const STAGE_WIDTH = 1280, MINI_WIDTH = 640, STAGE_HEIGHT = 720;
+const STAGE_WIDTH = 1280, MINI_WIDTH = 1280 / 3, STAGE_HEIGHT = 720;
 const ROW = { height: 32, gap: 5, usual: 15, finale: 12 };
 const TOP_ROWS = 10;
 const ANSWER = { room: 660, gap: 20, verdict: 250, largest: 44, smallest: 18, letter: 0.86 };
@@ -145,11 +145,7 @@ export class View {
 
   use(settings) {
     this.settings = settings;
-    const root = document.documentElement, body = document.body;
-    const value = parseInt(settings.accent.slice(1), 16);
-    const light = luminance(value >> 16 & 255, value >> 8 & 255, value & 255);
-    root.style.setProperty('--accent', settings.accent);
-    root.style.setProperty('--accent-ink', light > 0.55 ? '#06150b' : '#ffffff');
+    const body = document.body;
     body.classList.toggle('nocam', settings.webcam === 'none');
     body.classList.toggle('vtuber', settings.webcam === 'vtuber');
     const wasMini = body.classList.contains('mini');

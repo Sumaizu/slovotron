@@ -3,7 +3,7 @@ import { clean, fromQuery, toQuery } from './config.js';
 
 const STORAGE_KEY = 'slovotron.settings';
 const NUMBERS = ['pause', 'hint_every', 'reset_hour', 'reset_hours', 'volume'];
-const TEXTS = ['backend', 'difficulty', 'reset_mode', 'accent'];
+const TEXTS = ['backend', 'difficulty', 'reset_mode'];
 const FLAGS = ['chat_commands', 'sound', 'mini'];
 const DATE_MODES = ['day', 'week', 'month'];
 const BACKEND_HINTS = {

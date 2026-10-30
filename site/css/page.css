@@ -91,7 +91,7 @@ h2, legend {
 }
 @supports (width: 1cqw) {
   .screen { width: min(100cqw, 100cqh * 16 / 9); height: auto; aspect-ratio: 16 / 9; }
-  .screen.mini { width: min(100cqw, 100cqh * 8 / 9); aspect-ratio: 8 / 9; }
+  .screen.mini { width: min(100cqw, 100cqh * 16 / 27); aspect-ratio: 16 / 27; }
 }
 .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; color-scheme: light; }
 .note {
@@ -105,7 +105,7 @@ h2, legend {
   .layout, .layout.with-settings { grid-template: auto / minmax(0, 1fr); }
   .stage { container-type: normal; }
   .screen { width: 100%; height: auto; aspect-ratio: 16 / 9; }
-  .screen.mini { aspect-ratio: 8 / 9; }
+  .screen.mini { aspect-ratio: 16 / 27; }
   .settings { overflow-y: visible; }
 }
 
@@ -151,6 +151,7 @@ fieldset { border: 0; margin: 0 0 18px; padding: 0; display: grid; gap: 12px; mi
 .field > label, .field > .label { font-weight: 600; }
 .check { display: flex; gap: 9px; align-items: flex-start; }
 .check span { display: block; }
+.check.first { margin-bottom: 18px; }
 
 .switch {
   display: inline-flex; justify-self: start; border: 1px solid var(--line); border-radius: 11px; overflow: hidden;

@@ -571,12 +571,13 @@ test('оверлей: окошко под вебку на общем месте,
   const back = await playing();
   const backdrop = back.w.getComputedStyle(element(back.w, 'stage'), '::before');
   ok(backdrop.display !== 'none' && backdrop.boxShadow.includes('1400px'), 'место за рамкой залито, окошко пустое');
-  eq(back.w.document.documentElement.style.getPropertyValue('--accent'), '#16a34a');
+  eq(back.w.getComputedStyle(back.w.document.documentElement).getPropertyValue('--accent').trim(), '#16a34a');
   back.frame.remove();
   const mini = await playing('mini=1&accent=3fa7ff');
   ok(mini.w.document.body.classList.contains('mini'));
   const stage = box(element(mini.w, 'stage')), field = box(element(mini.w, 'main'));
-  eq([stage[1] - stage[0], field[0] - stage[0], stage[1] - field[1]], [640, 16, 16], 'вертикальная сцена 640×720');
+  ok(Math.abs(stage[1] - stage[0] - 1280 / 3) <= 1 && field[0] - stage[0] === 12 && stage[1] - field[1] === 12,
+    'вертикальная сцена 640×1080: ' + [stage, field]);
   eq(mini.w.getComputedStyle(element(mini.w, 'stage'), '::before').display, 'none');
   for (const node of [mini.w.document.querySelector('.chatbox'), element(mini.w, 'side'), mini.w.document.querySelector('.cam'),
     element(mini.w, 'round').parentNode, element(mini.w, 'label')]) {
@@ -584,7 +585,7 @@ test('оверлей: окошко под вебку на общем месте,
   }
   eq(mini.w.getComputedStyle(element(mini.w, 'card')).backgroundImage, 'none');
   ok(mini.w.document.querySelector('.head .logo').naturalWidth > 0, 'логотип сайта рядом с названием');
-  eq(mini.w.document.documentElement.style.getPropertyValue('--accent'), '#3fa7ff');
+  eq(mini.w.document.documentElement.style.getPropertyValue('--accent'), '', 'цвет из ссылки не берётся');
   await wait(900);
   const column = box(mini.w.document.querySelector('.column')), brand = box(mini.w.document.querySelector('.head .brand'));
   const hint = box(element(mini.w, 'timeline'));
@@ -758,11 +759,10 @@ test('встроенный оверлей: пока игру не начали �
   eq([element(w, 'label').textContent, element(w, 'clock').textContent], ['подсказка через 2:06', '5:12']);
   await wait(600);
   eq([element(w, 'clock').textContent, api.view.heard, net.calls], ['5:12', [], []]);
-  api.apply({ mini: true, hint_every: 0, accent: '#3fa7ff' });
+  api.apply({ mini: true, hint_every: 0 });
   ok(w.document.body.classList.contains('mini'));
   eq(w.getComputedStyle(element(w, 'timeline')).visibility, 'hidden');
   no(rows(w, 'best').some((row) => row[1] === 'подсказка'));
-  eq(w.document.documentElement.style.getPropertyValue('--accent'), '#3fa7ff');
   showSource(w, true);
   eq([api.game.state, net.calls], ['stopped', []]);
   frame.remove();
@@ -840,8 +840,9 @@ test('страница: при первом заходе — пример, ре�
   eq([game.slovotron.game.state, rows(game, 'best').length], ['stopped', 15]);
   eq(['play', 'pause', 'hint', 'skip', 'reset'].map((id) => [element(w, id).textContent, element(w, id).disabled]),
     [['Начать', false], ['Пауза', true], ['Подсказка', true], ['Новое слово', true], ['Сброс', true]]);
-  const fields = ['pause', 'hint_every', 'volume', 'backend', 'difficulty', 'reset_mode', 'accent'];
-  eq(fields.map((key) => element(w, 's-' + key).value), ['20', '180', '100', 'kontekstno', '', 'never', '#16a34a']);
+  const fields = ['pause', 'hint_every', 'volume', 'backend', 'difficulty', 'reset_mode'];
+  eq(fields.map((key) => element(w, 's-' + key).value), ['20', '180', '100', 'kontekstno', '', 'never']);
+  eq(element(w, 's-accent'), null, 'цвета в настройках нет');
   ok(element(w, 's-sound').checked && element(w, 's-chat_commands').checked);
   ok(element(w, 'difficulty-field').hidden && element(w, 'backend-hint').textContent.includes('контекстно.рф'));
   eq(w.document.querySelector('.author').textContent, 'Оригинальная идея FRA3A · Автор копии Sumaizu');
@@ -943,7 +944,7 @@ test('страница: кнопка «Настройки» открывает �
   ok(Math.abs(place(screen).width / place(screen).height - 16 / 9) < 0.02);
   ok(panel.scrollHeight > panel.clientHeight && place(panel).bottom <= w.innerHeight);
   eq(w.document.documentElement.scrollHeight, w.innerHeight);
-  for (const id of ['s-backend', 's-hint_every', 's-accent', 's-mini', 'defaults']) {
+  for (const id of ['s-backend', 's-hint_every', 's-mini', 'defaults']) {
     ok(place(element(w, id)).left >= place(panel).left && place(element(w, id)).right <= place(panel).right, id);
   }
   eq(all(w, '.check code').map((node) => node.textContent), ['!словотрон-раунд', '!словотрон-подсказка',
@@ -1077,8 +1078,6 @@ test('страница: настройки действуют сразу — и 
   await until(() => game.document.body.classList.contains('mini'), 'минималистичный оверлей на ходу');
   ok(element(w, 'webcam-field').hidden && element(w, 'game').parentNode.classList.contains('mini'));
   eq(query(w), 'channel=some_one&pause=45&hint_every=0&webcam=none&mini=1');
-  type(w, 's-accent', '#3fa7ff');
-  await until(() => game.document.documentElement.style.getPropertyValue('--accent') === '#3fa7ff', 'цвет на ходу');
   type(w, 's-backend', 'wordgun');
   no(element(w, 'difficulty-field').hidden);
   ok(element(w, 'backend-hint').textContent.includes('wordgun.ru'));
@@ -1094,8 +1093,8 @@ test('страница: настройки действуют сразу — и 
   ok(net.calls.includes('api.wordgun.ru/v2/create_game') && api.game._next.id.endsWith('-hard'), api.game._next.id);
   element(w, 'defaults').click();
   eq([query(w), element(w, 's-channel').value, element(w, 's-mini').checked, element(w, 's-backend').value,
-    element(w, 's-accent').value, api.game.s.pause, api.game.s.hint_every],
-  ['channel=some_one', 'some_one', false, 'kontekstno', '#16a34a', 20, 180]);
+    api.game.s.pause, api.game.s.hint_every],
+  ['channel=some_one', 'some_one', false, 'kontekstno', 20, 180]);
   ok(element(w, 'difficulty-field').hidden);
   element(w, 'play').click();
   frame.remove();
