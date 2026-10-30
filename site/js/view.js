@@ -150,7 +150,8 @@ export class View {
     const light = luminance(value >> 16 & 255, value >> 8 & 255, value & 255);
     root.style.setProperty('--accent', settings.accent);
     root.style.setProperty('--accent-ink', light > 0.55 ? '#06150b' : '#ffffff');
-    body.classList.toggle('nocam', !settings.webcam);
+    body.classList.toggle('nocam', settings.webcam === 'none');
+    body.classList.toggle('vtuber', settings.webcam === 'vtuber');
     body.classList.toggle('nochat', !settings.chat);
     body.classList.toggle('noside', !settings.side);
     body.classList.toggle('nobg', !settings.bg);

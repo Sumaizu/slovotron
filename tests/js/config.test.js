@@ -52,9 +52,18 @@ test('настройки: источник слов и сложность', () =
 test('настройки: флажки', () => {
   const off = clean({ chat_commands: 'false', sound: 'off', webcam: 'no', chat: 0, side: false, bg: '' });
   eq([off.chat_commands, off.sound, off.webcam, off.chat, off.side, off.bg],
-    [false, false, false, false, false, false]);
+    [false, false, 'none', false, false, false]);
   const on = clean({ chat_commands: 'да', sound: true, webcam: 1 });
-  eq([on.chat_commands, on.sound, on.webcam], [true, true, true]);
+  eq([on.chat_commands, on.sound, on.webcam], [true, true, 'cam']);
+});
+
+test('настройки: окошко под вебку — без вебки, с вебкой, витубер; старые ссылки читаются', () => {
+  eq(['none', 'cam', 'vtuber', 'VTuber', '0', '1', 'false', 'true', 'да', ''].map((webcam) => clean({ webcam }).webcam),
+    ['none', 'cam', 'vtuber', 'vtuber', 'none', 'cam', 'none', 'cam', 'cam', 'none']);
+  eq([clean({ webcam: true }).webcam, clean({ webcam: false }).webcam, clean({}).webcam], ['cam', 'none', 'cam']);
+  eq([toQuery({ webcam: 'vtuber' }), toQuery({ webcam: 'none' }), toQuery({ webcam: 'cam' })],
+    ['webcam=vtuber', 'webcam=none', '']);
+  eq(fromQuery('?webcam=0').webcam, 'none');
 });
 
 test('настройки: расписание очистки таблицы победителей', () => {
@@ -70,15 +79,15 @@ test('настройки: чужие ключи отбрасываются', () 
 test('ссылка: в неё попадает только то, что отличается от обычного', () => {
   eq(toQuery({}), '');
   eq(toQuery({ channel: 'streamer' }), 'channel=streamer');
-  eq(toQuery({ channel: 'streamer', pause: 20, hint_every: 0, accent: '#00ff88', webcam: false }),
-    'channel=streamer&hint_every=0&accent=00ff88&webcam=0');
+  eq(toQuery({ channel: 'streamer', pause: 20, hint_every: 0, accent: '#00ff88', webcam: 'none' }),
+    'channel=streamer&hint_every=0&accent=00ff88&webcam=none');
   eq(toQuery({ backend: 'wordgun', difficulty: 'hard' }), 'backend=wordgun&difficulty=hard');
 });
 
 test('ссылка: настройки возвращаются из неё теми же', () => {
   const settings = clean({ channel: 'streamer', backend: 'wordgun', difficulty: 'hell', pause: 45,
     hint_every: 120, chat_commands: false, reset_mode: 'week', reset_hour: 3, reset_hours: 48, sound: false,
-    volume: 35, accent: '#12ab9f', webcam: false, chat: false, side: false, bg: false });
+    volume: 35, accent: '#12ab9f', webcam: 'vtuber', chat: false, side: false, bg: false });
   eq(fromQuery('?' + toQuery(settings)), settings);
   eq(fromQuery(''), DEFAULTS);
   eq(fromQuery('?embed=1&channel=Streamer&accent=%2312AB9F').accent, '#12ab9f');

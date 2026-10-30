@@ -126,8 +126,11 @@
               <label for="s-accent">Цвет оформления</label>
               <div class="row"><input type="color" id="s-accent"></div>
             </div>
-            <div class="switch" role="group" aria-label="Окошко под вебку">
-              <button type="button" data-webcam="1">С вебкой</button><button type="button" data-webcam="0">Без вебки</button>
+            <div class="field">
+              <span class="label" id="webcam-label">Окошко под вебку</span>
+              <div class="switch" role="group" aria-labelledby="webcam-label">
+                <button type="button" data-webcam="none">Без вебки</button><button type="button" data-webcam="cam">С вебкой</button><button type="button" data-webcam="vtuber">Витубер</button>
+              </div>
             </div>
           </div>
           <div class="group">

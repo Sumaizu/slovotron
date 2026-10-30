@@ -561,10 +561,18 @@ test('оверлей: скрытые панели убавляют рамку, �
   const full = await playing();
   eq([box(element(full.w, 'card')), box(element(full.w, 'main'))], [[6, 1274], [318, 1038]]);
   eq(camAt(full.w), [18, 494, 280, 210], 'окошко под вебку — там же, где в других играх');
-  const backdrop = full.w.getComputedStyle(element(full.w, 'stage'), '::before');
-  ok(backdrop.display !== 'none' && backdrop.boxShadow.includes('1400px'), 'место за рамкой залито, окошко пустое');
-  eq(full.w.document.documentElement.style.getPropertyValue('--accent'), '#16a34a');
   full.frame.remove();
+  const vtuber = await playing('webcam=vtuber');
+  ok(vtuber.w.document.body.classList.contains('vtuber'));
+  eq(camAt(vtuber.w), [18, 344, 280, 360], 'окошко витубера — там же, где в других играх');
+  eq(box(element(vtuber.w, 'main'))[1], 1038, 'правый край поля на месте');
+  ok(vtuber.w.getComputedStyle(element(vtuber.w, 'stage'), '::before').clipPath.includes('344px'));
+  vtuber.frame.remove();
+  const back = await playing();
+  const backdrop = back.w.getComputedStyle(element(back.w, 'stage'), '::before');
+  ok(backdrop.display !== 'none' && backdrop.boxShadow.includes('1400px'), 'место за рамкой залито, окошко пустое');
+  eq(back.w.document.documentElement.style.getPropertyValue('--accent'), '#16a34a');
+  back.frame.remove();
   const bare = await playing('chat=0&side=0&bg=0&accent=3fa7ff');
   const classes = bare.w.document.body.classList;
   ok(classes.contains('nochat') && classes.contains('noside') && classes.contains('nobg'));
@@ -1053,10 +1061,11 @@ test('страница: настройки действуют сразу — и 
   await until(() => game.getComputedStyle(element(game, 'timeline')).visibility === 'hidden',
     'полоса подсказок скрыта');
   type(w, 'hide-chat', true);
-  w.document.querySelector('[data-webcam="0"]').click();
-  ok(w.document.querySelector('[data-webcam="0"]').classList.contains('on'));
+  eq(all(w, '[data-webcam]').map((button) => button.textContent), ['Без вебки', 'С вебкой', 'Витубер']);
+  w.document.querySelector('[data-webcam="none"]').click();
+  ok(w.document.querySelector('[data-webcam="none"]').classList.contains('on'));
   await until(() => game.document.body.classList.contains('nochat'), 'чат скрыт на ходу');
-  eq(query(w), 'channel=some_one&pause=45&hint_every=0&webcam=0&chat=0');
+  eq(query(w), 'channel=some_one&pause=45&hint_every=0&webcam=none&chat=0');
   type(w, 's-accent', '#3fa7ff');
   await until(() => game.document.documentElement.style.getPropertyValue('--accent') === '#3fa7ff', 'цвет на ходу');
   type(w, 's-backend', 'wordgun');

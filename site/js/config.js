@@ -11,7 +11,7 @@ export const DEFAULTS = {
   sound: true,
   volume: 100,
   accent: '#16a34a',
-  webcam: true,
+  webcam: 'cam',
   chat: true,
   side: true,
   bg: true,
@@ -29,10 +29,19 @@ function int(value, fallback, min, max) {
   return Number.isFinite(n) ? Math.max(min, Math.min(max, Math.trunc(n))) : fallback;
 }
 
+const CAMERAS = ['none', 'cam', 'vtuber'];
+
 function flag(value, fallback) {
   if (value === undefined) return fallback;
   if (typeof value === 'string') return !['', '0', 'false', 'no', 'off'].includes(value.trim().toLowerCase());
   return Boolean(value);
+}
+
+function camera(value, fallback) {
+  if (value === undefined) return fallback;
+  const name = String(value).trim().toLowerCase();
+  if (CAMERAS.includes(name)) return name;
+  return flag(value, true) ? 'cam' : 'none';
 }
 
 function channel(value) {
@@ -63,7 +72,7 @@ export function clean(raw) {
   s.sound = flag(raw.sound, d.sound);
   s.volume = int(raw.volume, d.volume, 0, 100);
   s.accent = COLOR_RE.test(String(raw.accent || '')) ? String(raw.accent).toLowerCase() : d.accent;
-  s.webcam = flag(raw.webcam, d.webcam);
+  s.webcam = camera(raw.webcam, d.webcam);
   s.chat = flag(raw.chat, d.chat);
   s.side = flag(raw.side, d.side);
   s.bg = flag(raw.bg, d.bg);

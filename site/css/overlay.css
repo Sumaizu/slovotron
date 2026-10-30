@@ -56,6 +56,9 @@ body {
 
 .nocam .cam { display: none; }
 .nocam .chatbox { grid-row: 1 / 3; }
+.vtuber .card { grid-template: "chat main side" minmax(0, 1fr) "cam main side" 360px / 280px minmax(0, 1fr) 204px; }
+.vtuber.noside .card { grid-template: "chat main" minmax(0, 1fr) "cam main" 360px / 280px minmax(0, 1fr); }
+.vtuber #stage::before { top: 344px; height: 360px; clip-path: inset(-344px -982px -16px -18px); }
 .nocam .card, .nochat .card { background: var(--card); }
 
 .nochat .cam, .nochat .chatbox { display: none; }
