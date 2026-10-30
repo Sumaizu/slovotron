@@ -45,15 +45,15 @@ OVERLAY_READY = "window.slovotron && document.querySelectorAll('#best .row').len
 PAGE_READY = "document.getElementById('play') && !document.getElementById('play').disabled ? 1 : 0"
 
 
-def open_overlay(browser, base, query=""):
-    browser.set_size(1280, 720)
+def open_overlay(browser, base, query="", width=1280):
+    browser.set_size(width, 720)
     browser.navigate(f"{base}/overlay.html?embed=1{'&' + query if query else ''}")
     browser.wait_for(OVERLAY_READY, 30)
     browser.evaluate(CAMERA_PLACEHOLDER)
 
 
-def shoot_overlay(browser, base, out, query=""):
-    open_overlay(browser, base, query)
+def shoot_overlay(browser, base, out, query="", width=1280):
+    open_overlay(browser, base, query, width)
     time.sleep(0.5)
     browser.screenshot(out, transparent=True)
 
@@ -85,7 +85,7 @@ def main():
         with Browser() as browser:
             browser.run_in_every_page(NO_NETWORK)
             shoot_overlay(browser, base, out / "overlay.png")
-            shoot_overlay(browser, base, out / "overlay-compact.png", "chat=0&side=0")
+            shoot_overlay(browser, base, out / "overlay-mini.png", "mini=1", 427)
             shoot_victory(browser, base, out / "overlay-win.png")
             shoot_page(browser, base, out / "page.png")
     finally:
