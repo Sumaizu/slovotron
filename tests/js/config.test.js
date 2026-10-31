@@ -1,4 +1,5 @@
 import { DEFAULTS, clean, fromQuery, toQuery } from '../../site/js/config.js';
+import { playNote, reportPlay } from '../../site/js/stats.js';
 import { eq, no, test } from './harness.js';
 
 test('настройки: значения по умолчанию', () => {
@@ -92,4 +93,14 @@ test('ссылка: настройки возвращаются из неё те
   eq(fromQuery(''), DEFAULTS);
   no('accent' in fromQuery('?embed=1&channel=Streamer&accent=%2312AB9F'));
   eq(fromQuery('?embed=1&channel=Streamer').channel, 'streamer');
+});
+
+test('статистика: отметка о запуске — только с каналом и только с сайта gamesonstream.ru', () => {
+  eq(playNote('slovotron', { channel: '', webcam: 'cam' }, false), null);
+  eq(playNote('slovotron', { channel: 'some_one', webcam: 'vtuber' }, true),
+    { game: 'slovotron', channel: 'some_one', mode: 'vtuber', place: 'browser' });
+  eq(playNote('slovotron', { channel: 'some_one', webcam: 'none' }, false).place, 'obs');
+  eq(playNote('slovotron', { channel: 'some_one', webcam: 'cam', mini: true }, false).mode, 'mini');
+  eq([reportPlay({ game: 'x' }, '127.0.0.1'), reportPlay({ game: 'x' }, 'sumaizu.github.io'), reportPlay(null, 'gamesonstream.ru')],
+    [false, false, false]);
 });
