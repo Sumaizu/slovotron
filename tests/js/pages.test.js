@@ -680,6 +680,26 @@ test('оверлей: снежный ник — голубая рамка, по 
   frame.remove();
 });
 
+test('оверлей: ник Renozis — красный, из середины мерцает блик, в лад у всех сообщений', async () => {
+  fresh();
+  const { frame, w, chat } = await playing();
+  const style = (node) => w.getComputedStyle(node);
+  const lines = () => all(w, '#chat .msg');
+  chat.onMessage('Renozis', 'привет всем', false, { login: 'renozis' });
+  await wait(700);
+  chat.onMessage('Renozis', 'я тут', false, { login: 'renozis' });
+  await until(() => lines().length === 2, 'два сообщения');
+  eq(lines()[0].className.split(' ').slice(0, 3), ['msg', 'star', 'star-glare']);
+  eq(style(lines()[0]).borderTopColor, 'rgb(255, 43, 43)');
+  eq(style(lines()[0].querySelector('b')).animationName, 'glare');
+  await until(() => {
+    const phases = w.document.getAnimations().filter((item) => item.animationName === 'glare')
+      .map((item) => item.effect.getComputedTiming().progress);
+    return phases.length === 2 && !phases.includes(null) && Math.abs(phases[0] - phases[1]) < 0.02;
+  }, 'блик мерцает в лад');
+  frame.remove();
+});
+
 test('оверлей: радуга автора идёт в лад везде, где есть его ник, — при любой длине слова', async () => {
   fresh();
   const { frame, w, chat } = await playing();

@@ -11,6 +11,7 @@
   --thyme: #5edc1f;
   --heart: #d42426;
   --snow: #a6d6ff;
+  --glare: #ff2b2b;
 }
 
 * { box-sizing: border-box; }
@@ -283,6 +284,7 @@ body {
 .msg.star-white { --frame: #fff; --tint: rgba(255, 255, 255, .06); --glow: rgba(255, 255, 255, .16); }
 .msg.star-thyme { --frame: var(--thyme); --tint: rgba(94, 220, 31, .07); --glow: rgba(94, 220, 31, .2); }
 .msg.star-snow { --frame: var(--snow); --tint: rgba(166, 214, 255, .07); --glow: rgba(166, 214, 255, .2); }
+.msg.star-glare { --frame: var(--glare); --tint: rgba(255, 43, 43, .08); --glow: rgba(255, 43, 43, .25); }
 .msg.star-heart {
   --frame: var(--heart); --tint: rgba(212, 36, 38, .1); --glow: rgba(212, 36, 38, .25); padding-right: 28px;
 }
@@ -327,3 +329,22 @@ body {
   animation: snow-glint 6s ease-in-out var(--phase, 0s) infinite;
 }
 @keyframes snow-glint { 0%, 70% { background-position: -230px 0; } 100% { background-position: 20px 0; } }
+.glare, .list li.first .name.glare {
+  background: radial-gradient(closest-side, #fff 30%, #ffc2c2 50%, var(--glare) 90%) center / 70% 100% no-repeat,
+    var(--glare);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 3px rgba(255, 43, 43, .7));
+  animation: glare 3s linear var(--phase, 0s) infinite;
+}
+.list .name.glare { flex: 0 1 auto; margin-right: auto; }
+@keyframes glare {
+  0%, 100% { background-size: 70% 100%, auto; filter: drop-shadow(0 0 3px rgba(255, 43, 43, .7)); }
+  9% { background-size: 25% 100%, auto; filter: drop-shadow(0 0 1px rgba(255, 43, 43, .4)); }
+  13% { background-size: 120% 100%, auto; filter: drop-shadow(0 0 6px rgba(255, 43, 43, .95)); }
+  31% { background-size: 55% 100%, auto; }
+  35% { background-size: 100% 100%, auto; filter: drop-shadow(0 0 5px rgba(255, 43, 43, .85)); }
+  52% { background-size: 30% 100%, auto; filter: drop-shadow(0 0 2px rgba(255, 43, 43, .5)); }
+  56% { background-size: 95% 100%, auto; }
+  74% { background-size: 60% 100%, auto; }
+  78% { background-size: 110% 100%, auto; filter: drop-shadow(0 0 6px rgba(255, 43, 43, .95)); }
+}

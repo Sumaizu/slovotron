@@ -674,7 +674,7 @@ test('чат: смайлики Twitch доходят до ленты', async () 
 test('чат: особые ники узнаются по логину — в ленте, в словах и в итогах', async () => {
   const { game } = await startRound();
   eq(Array.from(STARS), [['sumaizu', 'rainbow'], ['sukoshissrb', 'white'], ['fra3a', 'thyme'],
-    ['welovegames', 'heart'], ['higashi_vo', 'snow']]);
+    ['welovegames', 'heart'], ['higashi_vo', 'snow'], ['renozis', 'glare']]);
   game.feed('Sumaizu', 'привет всем', { login: 'sumaizu' });
   game.feed('Петя', 'привет всем', { login: 'petya' });
   game.feed('Ник На Кириллице', 'привет всем', { login: 'sumaizu' });
@@ -683,8 +683,9 @@ test('чат: особые ники узнаются по логину — в л
   game.feed('SukoshiSSRB', 'привет всем', { login: 'sukoshissrb' });
   game.feed('FRA3A', 'привет всем');
   game.feed('higashi_vo', 'привет всем');
+  game.feed('Renozis', 'привет всем', { login: 'renozis' });
   game.feed('constructor', 'привет всем');
-  eq(game.snapshot().feed.map((m) => m.star), ['rainbow', '', 'rainbow', '', 'rainbow', 'white', 'thyme', 'snow', '']);
+  eq(game.snapshot().feed.map((m) => m.star), ['rainbow', '', 'rainbow', '', 'rainbow', 'white', 'thyme', 'snow', 'glare', '']);
   eq(game.snapshot().stars, Array.from(STARS));
   await say(game, 'WELOVEGAMES', 'молот', { login: 'welovegames' });
   await say(game, 'Sumaizu', 'серп', { login: 'sumaizu' });
