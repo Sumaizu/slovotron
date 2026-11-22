@@ -644,7 +644,7 @@ test('оверлей: в чате — особые ники и смайлики;
   ok(lines()[0].querySelector('b').classList.contains('rainbow') && lines()[0].querySelector('.rank.near'));
   eq([style(lines()[0]).borderTopWidth, style(lines()[0], '::before').content], ['0px', 'none']);
   eq([style(second).borderTopWidth, style(second, '::after').content], ['0px', 'none']);
-  eq(style(second.querySelector('b')).color, 'rgb(212, 36, 38)');
+  eq(style(second.querySelector('b')).animationName, 'heart-reds');
   ok(w.document.querySelector('#best .who b.rainbow'));
   eq(images(lines()[2]), ['https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/2.0']);
   chat.status.roomId = '123';

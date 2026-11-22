@@ -9,7 +9,6 @@
   --chip: rgba(12, 10, 24, .58);
   --win: #c084fc;
   --thyme: #5edc1f;
-  --heart: #d42426;
   --snow: #a6d6ff;
   --glare: #ff2b2b;
 }
@@ -293,7 +292,15 @@ body {
 @keyframes rainbow { to { background-position: 0 0, 120px 0; } }
 .white, .list li.first .name.white { color: #fff; }
 .thyme, .list li.first .name.thyme { color: var(--thyme); }
-.heart, .list li.first .name.heart { color: var(--heart); }
+.heart, .list li.first .name.heart {
+  background:
+    linear-gradient(rgba(255, 255, 255, .35), rgba(255, 255, 255, .12) 54%, rgba(0, 0, 0, .05) 56%, rgba(0, 0, 0, .3)),
+    linear-gradient(90deg, #e3333d, #ff5560, #c81e2b, #f2414b, #b8162a, #e3333d) 0 0 / 240px 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  filter: url(#glow);
+  animation: heart-reds 8s linear var(--phase, 0s) infinite;
+}
+@keyframes heart-reds { to { background-position: 0 0, 240px 0; } }
 .snow, .list li.first .name.snow {
   background: linear-gradient(105deg, var(--snow) 0 46.5%, #fff 49.5% 50.5%, var(--snow) 53.5% 100%) -230px 0 /
     400px 100%;
