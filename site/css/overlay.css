@@ -324,17 +324,14 @@ body {
   background:
     linear-gradient(100deg, transparent 0 44%, rgba(255, 255, 255, .95) 50%, transparent 56% 100%) -300px 0 / 300px 100%
       no-repeat,
-    linear-gradient(rgba(255, 255, 255, .7), rgba(255, 255, 255, .35) 54%, rgba(0, 0, 0, .05) 56%, rgba(0, 0, 0, .4)),
-    linear-gradient(90deg, #00b377, #5fffc4 10%, #00b377 22%, #0b5c44 26%, #6a0b24 29%, #e0102f 33%, #ff6b78 44%,
-      #e0102f 55%, #6a32ff 66%, #c39bff 77%, #6a32ff 88%, #00b377) 0 0 / 360px 100%;
+    linear-gradient(rgba(255, 255, 255, .45), rgba(255, 255, 255, .18) 54%, rgba(0, 0, 0, .05) 56%, rgba(0, 0, 0, .3)),
+    linear-gradient(90deg, #00d980, #4dffb8 10%, #00d980 22%, #08704f 26%, #8a0a26 29%, #ff1a3c 33%, #ff6680 44%,
+      #ff1a3c 55%, #7a2dff 66%, #b57aff 77%, #7a2dff 88%, #00d980) 0 0 / 360px 100%;
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
-  filter: drop-shadow(0 0 3px rgba(95, 255, 196, .6));
+  filter: url(#glow);
   animation: gem 6s linear var(--phase, 0s) infinite;
 }
 @keyframes gem {
-  0%, 100% { filter: drop-shadow(0 0 3px rgba(95, 255, 196, .6)); }
-  0% { background-position: -300px 0, 0 0, 0 0; }
-  33% { filter: drop-shadow(0 0 3px rgba(195, 155, 255, .65)); }
-  66% { filter: drop-shadow(0 0 3px rgba(255, 107, 120, .6)); }
-  100% { background-position: 300px 0, 0 0, 360px 0; }
+  from { background-position: -300px 0, 0 0, 0 0; }
+  to { background-position: 300px 0, 0 0, 360px 0; }
 }
