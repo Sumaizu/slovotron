@@ -11,7 +11,7 @@ const BEST_SOUND_RANK = 150;
 const FINAL_SECONDS = 3;
 const CLOCK_SLACK = 0.05;
 const CONFETTI = { rest: 5, shortest: 5, longest: 30 };
-const CYCLES = new Map([['rainbow', 2400], ['heart', 15000], ['snow-glint', 6000], ['glare', 3000]]);
+const CYCLES = new Map([['rainbow', 2400], ['snow-glint', 6000], ['glare', 3000], ['gem', 6000]]);
 const HEADLINES = { win: 'Слово угадано!', skip: 'Раунд окончен', lost: 'Раунд прерван' };
 const VERDICTS = { win: 'Победитель', skip: 'Никто не угадал', lost: 'Сервер слов завершил игру' };
 const NOTES = { repeat: 'уже было', unknown: 'нет в словаре', failed: 'не проверено' };
@@ -450,8 +450,7 @@ export class View {
 
   _messageRow(message, fresh) {
     const star = message.star || '', scored = message.rank > 0;
-    const marks = (scored && !message.repeat ? ' hit' : '') + (star ? ' star star-' + star : '') +
-      (fresh ? ' pop' : '');
+    const marks = (scored && !message.repeat ? ' hit' : '') + (fresh ? ' pop' : '');
     const row = el('div', 'msg' + marks), text = el('span', 'text');
     this._fillText(text, message);
     row.append(...nickParts(message), ' ', text);

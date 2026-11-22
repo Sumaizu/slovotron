@@ -637,13 +637,14 @@ test('оверлей: в чате — особые ники и смайлики;
   chat.onMessage('Оля', 'Kappa ну и слово constructor', false, { emotes: { Kappa: '25' } });
   await until(() => lines().length === 3, 'три сообщения');
   const second = lines()[1];
-  eq([lines()[0].innerText, lines()[0].className], ['Sumaizu молот', 'msg star star-rainbow pop']);
+  eq([lines()[0].innerText, lines()[0].className], ['Sumaizu молот', 'msg pop']);
   release();
   await until(() => lines()[0].innerText === 'Sumaizu молот 2', 'число дописано');
-  eq([lines().length, lines()[0].className, lines()[1] === second], [3, 'msg hit star star-rainbow', true]);
+  eq([lines().length, lines()[0].className, lines()[1] === second], [3, 'msg hit', true]);
   ok(lines()[0].querySelector('b').classList.contains('rainbow') && lines()[0].querySelector('.rank.near'));
-  eq(style(lines()[0], '::before').animationName, 'rainbow');
-  eq([style(second).borderTopColor, style(second, '::after').animationName], ['rgb(212, 36, 38)', 'heart']);
+  eq([style(lines()[0]).borderTopWidth, style(lines()[0], '::before').content], ['0px', 'none']);
+  eq([style(second).borderTopWidth, style(second, '::after').content], ['0px', 'none']);
+  eq(style(second.querySelector('b')).color, 'rgb(212, 36, 38)');
   ok(w.document.querySelector('#best .who b.rainbow'));
   eq(images(lines()[2]), ['https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/2.0']);
   chat.status.roomId = '123';
@@ -658,7 +659,7 @@ test('оверлей: в чате — особые ники и смайлики;
   frame.remove();
 });
 
-test('оверлей: снежный ник — голубая рамка, по нику бежит блик, в лад у всех сообщений', async () => {
+test('оверлей: снежный ник — по нику бежит блик, в лад у всех сообщений', async () => {
   fresh();
   const { frame, w, chat } = await playing();
   const style = (node, pseudo) => w.getComputedStyle(node, pseudo);
@@ -667,11 +668,9 @@ test('оверлей: снежный ник — голубая рамка, по 
   await wait(700);
   chat.onMessage('higashi_vo', 'я тут', false, { login: 'higashi_vo' });
   await until(() => lines().length === 2, 'два сообщения');
-  eq(lines()[0].className.split(' ').slice(0, 3), ['msg', 'star', 'star-snow']);
-  eq(style(lines()[0]).borderTopColor, 'rgb(166, 214, 255)');
+  eq(style(lines()[0]).borderTopWidth, '0px');
   eq(style(lines()[0].querySelector('b')).animationName, 'snow-glint');
   ok(lines()[0].querySelector('b').classList.contains('snow'));
-  eq(style(lines()[0], '::after').content, 'none');
   await until(() => {
     const phases = w.document.getAnimations().filter((item) => item.animationName === 'snow-glint')
       .map((item) => item.effect.getComputedTiming().progress);
@@ -689,14 +688,29 @@ test('оверлей: ник Renozis — красный, из середины �
   await wait(700);
   chat.onMessage('Renozis', 'я тут', false, { login: 'renozis' });
   await until(() => lines().length === 2, 'два сообщения');
-  eq(lines()[0].className.split(' ').slice(0, 3), ['msg', 'star', 'star-glare']);
-  eq(style(lines()[0]).borderTopColor, 'rgb(255, 43, 43)');
+  eq(style(lines()[0]).borderTopWidth, '0px');
   eq(style(lines()[0].querySelector('b')).animationName, 'glare');
   await until(() => {
     const phases = w.document.getAnimations().filter((item) => item.animationName === 'glare')
       .map((item) => item.effect.getComputedTiming().progress);
     return phases.length === 2 && !phases.includes(null) && Math.abs(phases[0] - phases[1]) < 0.02;
   }, 'блик мерцает в лад');
+  frame.remove();
+});
+
+test('оверлей: ник sulffur_ — глянцевые переливы нефрита, фиолетового и красного, в лад у всех сообщений', async () => {
+  fresh();
+  const { frame, w, chat } = await playing();
+  const style = (node) => w.getComputedStyle(node);
+  const lines = () => all(w, '#chat .msg');
+  chat.onMessage('sulffur_', 'привет всем', false, { login: 'sulffur_' });
+  await wait(700);
+  chat.onMessage('sulffur_', 'я тут', false, { login: 'sulffur_' });
+  await until(() => lines().length === 2, 'два сообщения');
+  const nick = lines()[0].querySelector('b');
+  eq([nick.className, style(nick).animationName, style(nick).webkitTextFillColor], ['gem', 'gem', 'rgba(0, 0, 0, 0)']);
+  eq(style(lines()[0]).borderTopWidth, '0px');
+  await until(() => inStep(w, 'gem', 2), 'переливы идут в лад');
   frame.remove();
 });
 
@@ -721,11 +735,11 @@ test('оверлей: радуга автора идёт в лад везде, �
     ok(Math.abs(letters.getBoundingClientRect().width - nick.getBoundingClientRect().width) < 0.5);
     eq(w.getComputedStyle(nick).animationName, 'rainbow');
   }
-  await until(() => inStep(w, 'rainbow', 9), 'ники в столбике, ники и рамки в чате переливаются в лад');
+  await until(() => inStep(w, 'rainbow', 6), 'ники в столбике и в чате переливаются в лад');
   chat.onMessage('Sumaizu', 'серп', false, author);
   await until(() => w.document.querySelector('#winner b.rainbow'), 'автор победил');
   ok(w.document.querySelector('#winner .crown') && w.document.querySelector('#best .who .crown'));
-  await until(() => inStep(w, 'rainbow', 14), 'плашка победы и таблица победителей — тоже в лад, и с короной');
+  await until(() => inStep(w, 'rainbow', 10), 'плашка победы и таблица победителей — тоже в лад, и с короной');
   eq(w.getComputedStyle(w.document.querySelector('#winner b.rainbow')).webkitTextFillColor, 'rgba(0, 0, 0, 0)');
   frame.remove();
   fresh();

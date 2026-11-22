@@ -55,5 +55,12 @@
   </div>
 </div>
 <script type="module" src="js/overlay.js"></script>
+<svg class="defs" width="0" height="0" aria-hidden="true">
+  <filter id="glow" x="-20%" y="-60%" width="140%" height="220%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur"/>
+    <feComponentTransfer in="blur" result="halo"><feFuncA type="linear" slope="0.9"/></feComponentTransfer>
+    <feMerge><feMergeNode in="halo"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</svg>
 </body>
 </html>
