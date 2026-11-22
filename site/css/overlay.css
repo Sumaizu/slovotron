@@ -302,23 +302,24 @@ body {
 }
 @keyframes snow-glint { 0%, 70% { background-position: -230px 0; } 100% { background-position: 20px 0; } }
 .glare, .list li.first .name.glare {
-  background: radial-gradient(closest-side, #fff 30%, #ffc2c2 50%, var(--glare) 90%) center / 70% 100% no-repeat,
-    var(--glare);
+  background:
+    linear-gradient(rgba(255, 255, 255, .35), rgba(255, 255, 255, .12) 54%, rgba(0, 0, 0, .05) 56%, rgba(0, 0, 0, .3)),
+    radial-gradient(closest-side, #fff 30%, #ffc2c2 50%, var(--glare) 90%) center / 70% 100% no-repeat, var(--glare);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
-  filter: drop-shadow(0 0 3px rgba(255, 43, 43, .7));
+  filter: url(#glow);
   animation: glare 3s linear var(--phase, 0s) infinite;
 }
 .list .name.glare { flex: 0 1 auto; margin-right: auto; }
 @keyframes glare {
-  0%, 100% { background-size: 70% 100%, auto; filter: drop-shadow(0 0 3px rgba(255, 43, 43, .7)); }
-  9% { background-size: 25% 100%, auto; filter: drop-shadow(0 0 1px rgba(255, 43, 43, .4)); }
-  13% { background-size: 120% 100%, auto; filter: drop-shadow(0 0 6px rgba(255, 43, 43, .95)); }
-  31% { background-size: 55% 100%, auto; }
-  35% { background-size: 100% 100%, auto; filter: drop-shadow(0 0 5px rgba(255, 43, 43, .85)); }
-  52% { background-size: 30% 100%, auto; filter: drop-shadow(0 0 2px rgba(255, 43, 43, .5)); }
-  56% { background-size: 95% 100%, auto; }
-  74% { background-size: 60% 100%, auto; }
-  78% { background-size: 110% 100%, auto; filter: drop-shadow(0 0 6px rgba(255, 43, 43, .95)); }
+  0%, 100% { background-size: auto, 70% 100%; }
+  9% { background-size: auto, 25% 100%; }
+  13% { background-size: auto, 120% 100%; }
+  31% { background-size: auto, 55% 100%; }
+  35% { background-size: auto, 100% 100%; }
+  52% { background-size: auto, 30% 100%; }
+  56% { background-size: auto, 95% 100%; }
+  74% { background-size: auto, 60% 100%; }
+  78% { background-size: auto, 110% 100%; }
 }
 .gem, .list li.first .name.gem {
   background:
